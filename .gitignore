@@ -1,0 +1,8 @@
+__pycache__/ 
+*.pyc 
+.venv/ 
+.env 
+reports/ 
+samples/*.eml 
+!samples/sample_phish.eml 
+!samples/sample_benign.eml 

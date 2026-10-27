@@ -1,0 +1,26 @@
+Received: from mail.evil-host.example (mail.evil-host.example [203.0.113.45]) by mx.victim.example; Tue, 27 Oct 2026 08:00:00 +0000
+Return-Path: <bounce@evil-host.example>
+Authentication-Results: mx.victim.example; spf=fail smtp.mailfrom=evil-host.example; dkim=none; dmarc=fail
+From: "PayPal Support paypal.com" <support@secure-pay-verify.example>
+Reply-To: <collect@gmail-drop.example>
+To: victim@victim.example
+Subject: URGENT: verify your account immediately
+Date: Tue, 27 Oct 2026 08:00:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="BOUNDARY"
+
+--BOUNDARY
+Content-Type: text/html; charset="utf-8"
+
+<html><body>
+<p>Your account is suspended. Final notice: act now.</p>
+<p><a href="http://198.51.100.7/login/paypal">https://www.paypal.com/security</a></p>
+<p>Or visit http://bit.ly/3fakeLink</p>
+</body></html>
+--BOUNDARY
+Content-Type: application/octet-stream; name="invoice.pdf.exe"
+Content-Disposition: attachment; filename="invoice.pdf.exe"
+Content-Transfer-Encoding: base64
+
+SGFybWxlc3MgdGVzdCBmaWxlIGZvciBhbmFseXplciBkZW1v
+--BOUNDARY--

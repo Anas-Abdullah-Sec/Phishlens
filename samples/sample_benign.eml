@@ -1,0 +1,10 @@
+Received: from mail.example.org (mail.example.org [93.184.216.34]) by mx.example.net; Tue, 27 Oct 2026 09:00:00 +0000
+Return-Path: <alice@example.org>
+Authentication-Results: mx.example.net; spf=pass; dkim=pass; dmarc=pass
+From: Alice <alice@example.org>
+To: bob@example.net
+Subject: Lunch tomorrow?
+Date: Tue, 27 Oct 2026 09:00:00 +0000
+Content-Type: text/plain; charset="utf-8"
+
+Hi Bob, are we still on for lunch tomorrow? See the menu: https://example.org/menu
