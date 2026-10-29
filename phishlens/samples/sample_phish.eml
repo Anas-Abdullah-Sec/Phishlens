@@ -22,5 +22,5 @@ Content-Type: application/octet-stream; name="invoice.pdf.exe"
 Content-Disposition: attachment; filename="invoice.pdf.exe"
 Content-Transfer-Encoding: base64
 
-SGFybWxlc3MgdGVzdCBmaWxlIGZvciBhbmFseXplciBkZW1v
+SGFybWxlc3MgdGVzdCBmaWxlIGZvciB0aGUgUGhpc2hMZW5zIGRlbW8=
 --BOUNDARY--

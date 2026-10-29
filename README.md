@@ -1,242 +1,211 @@
 <div align="center">
 
-# 🎣 Phishing Email Analyzer
+<img src="assets/phishlens.png" alt="" width="84">
 
-**Triage suspicious emails like a SOC analyst, in one command.**
+# PhishLens
 
-Header forensics · URL & attachment analysis · Threat-intel enrichment · Risk scoring · MITRE ATT&CK mapping
+**Drop in a suspicious email. See exactly what's wrong with it.**
 
-<br>
-
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-T1566-red?style=for-the-badge)
-![Focus](https://img.shields.io/badge/Focus-Blue%20Team%20%2F%20SOC-1f6feb?style=for-the-badge)
+[![tests](https://github.com/Anas-Abdullah-Sec/phishlens/actions/workflows/tests.yml/badge.svg)](https://github.com/Anas-Abdullah-Sec/phishlens/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/python-3.9%2B-3776AB)
+![Dependencies](https://img.shields.io/badge/dependencies-none-2ea043)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
 <br>
 
-[Features](#-features) ·
-[Quick Start](#-quick-start) ·
-[Sample Output](#-sample-output) ·
-[How It Works](#-how-it-works) ·
-[Scoring](#-scoring-engine) ·
-[Roadmap](#-roadmap)
+<img src="docs/screenshot-result.png" alt="PhishLens marking up a phishing email with numbered findings" width="900">
 
 </div>
 
----
+<br>
 
-## 🧭 Why this exists
+PhishLens opens a phishing email the way an analyst would, then marks the evidence **on the email itself**. Numbered pins sit on the spoofed sender, the link that says one thing and goes somewhere else, the pressure words and the disguised attachment. Click a pin to see why it counts, or click a finding to jump to it.
 
-Phishing is the most common way attackers get in, and reviewing suspicious emails is one of the most repetitive tasks in a SOC. This tool automates the first-pass triage: feed it a `.eml` file and get a clear verdict with the evidence behind it, in seconds.
+Everything runs on your own computer. No account, no upload, no dependencies.
 
-> 🔒 **Safe by design.** Attachments are only hashed, never opened or executed. All URLs in reports are defanged (`hxxp://example[.]com`) so they are safe to share and paste into tickets.
+## Get it
 
-## ✨ Features
+### Windows, no Python needed
 
-| | Capability | Details |
-|---|---|---|
-| 📨 | **Header analysis** | SPF / DKIM / DMARC results, From vs Reply-To vs Return-Path mismatches, display-name spoofing, origin IP from the `Received` chain |
-| 🔗 | **URL inspection** | Extracts links from text and HTML, flags visible-text vs real-destination mismatch, raw-IP hosts, URL shorteners, punycode (homograph) domains |
-| 📎 | **Attachment triage** | Filename, MIME type, size, SHA256, risky extensions and double extensions such as `invoice.pdf.exe` |
-| 🌐 | **Threat intelligence** | Optional enrichment via VirusTotal (URLs, file hashes) and AbuseIPDB (origin IP) |
-| 🎯 | **Risk scoring** | Transparent 0-100 score with LOW / MEDIUM / HIGH / CRITICAL verdict and a table explaining every point |
-| 🗺️ | **MITRE ATT&CK mapping** | Every finding tagged with its technique (T1566.001, T1566.002, T1656) |
-| 📄 | **Flexible output** | Markdown report for humans, JSON for automation |
+1. Download **`PhishLens.exe`** from the [latest release](https://github.com/Anas-Abdullah-Sec/phishlens/releases/latest).
+2. Double-click it. A small console window opens (leave it open) and PhishLens appears in your browser.
 
-## 🚀 Quick Start
+Windows may say it "protected your PC" because the file is not code-signed. Choose **More info**, then **Run anyway**. The executable is built from this repository by GitHub Actions, and you can read the workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml).
 
-### Install
+### Windows, if you already have Python
 
-**Windows**
-```powershell
-git clone https://github.com/Anas-Abdullah-Sec/phishing-analyzer.git
-cd phishing-analyzer
-py -m venv .venv
-.venv\Scripts\activate
-py -m pip install -r requirements.txt
-```
+Press **Code, Download ZIP** on this page, extract it, and double-click **`Start-PhishLens.bat`**.
 
-**Linux / macOS**
-```bash
-git clone https://github.com/Anas-Abdullah-Sec/phishing-analyzer.git
-cd phishing-analyzer
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+### Any system, with pip
 
-### Run
+You need Python 3.9 or newer ([python.org](https://www.python.org/downloads/)). Then:
 
 ```bash
-# Analyze an email (offline, no API keys needed)
-python -m phishing_analyzer samples/sample_phish.eml --no-intel
-
-# Save the report to a file
-python -m phishing_analyzer samples/sample_phish.eml --no-intel -o reports/report.md
-
-# Machine-readable JSON
-python -m phishing_analyzer samples/sample_phish.eml --no-intel --format json
+python -m pip install https://github.com/Anas-Abdullah-Sec/phishlens/archive/refs/heads/main.zip
+python -m phishlens gui
 ```
 
-> On Windows use `py -m phishing_analyzer ...` if `python` is not on your PATH.
+No Git required. If you prefer pipx: `pipx install git+https://github.com/Anas-Abdullah-Sec/phishlens.git`, then run `phishlens gui`.
 
-### Enable threat intelligence (optional)
+## Using it
 
-Free API keys: [VirusTotal](https://www.virustotal.com) · [AbuseIPDB](https://www.abuseipdb.com)
+Drop an `.eml` file anywhere on the page, or press **Open a sample** to see a finished result straight away. When you are done, press **Quit** (or close the console window).
 
-| Shell | Command |
+| Mail app | How to get the .eml |
 |---|---|
-| CMD | `set VT_API_KEY=your_key` and `set ABUSEIPDB_API_KEY=your_key` |
-| PowerShell | `$env:VT_API_KEY="your_key"` and `$env:ABUSEIPDB_API_KEY="your_key"` |
-| Bash | `export VT_API_KEY="your_key"` and `export ABUSEIPDB_API_KEY="your_key"` |
+| Gmail | Open the message, three dots, **Download message** |
+| Outlook | Drag the message onto your desktop, or **File, Save As** |
+| Apple Mail | **File, Save As**, format *Raw Message Source* |
+| Thunderbird | Right-click the message, **Save As** |
 
-Then run without `--no-intel`:
-```bash
-python -m phishing_analyzer path/to/email.eml
-```
-The VirusTotal free tier allows 4 requests per minute, so lookups are capped (`--max-lookups`, default 4) and throttled automatically.
+<table>
+<tr>
+<td width="50%"><img src="docs/screenshot-start.png" alt="The start screen"></td>
+<td width="50%"><img src="docs/screenshot-dark.png" alt="The same result in dark mode"></td>
+</tr>
+</table>
 
-## 🖼️ Demo
+The window follows your system's light or dark setting and works on a phone-sized screen too.
 
-<div align="center">
+## What it checks
 
-![Demo](docs/demo.png)
+| Where | What PhishLens looks for |
+|---|---|
+| **Sender** | SPF, DKIM and DMARC results, replies or bounces going to another domain, display names that borrow a brand's domain |
+| **Links** | Text that says one address while the link goes to another, raw IP addresses, URL shorteners, lookalike (punycode) domains |
+| **Attachments** | SHA256 hashes and risky file types, including tricks like `invoice.pdf.exe`. Files are never opened |
+| **Wording** | Pressure phrases such as "act now" and "account suspended" |
 
-</div>
+Every finding carries its [MITRE ATT&CK](https://attack.mitre.org/techniques/T1566/) technique. One click copies a defanged list of URLs, domains, IPs and hashes, ready for a ticket.
 
-## 📊 Sample Output
+## The score
 
-Running the tool against the bundled demo phishing email (`samples/sample_phish.eml`):
-
-```text
-Verdict: CRITICAL (score 100/100)
-
-| Points | Finding                                                         | MITRE ATT&CK |
-|--------|-----------------------------------------------------------------|--------------|
-| +20    | SPF fail                                                        | T1566.001    |
-| +20    | DMARC failed                                                    | T1566.001    |
-| +15    | Reply-To domain differs from From                               | T1566.001    |
-| +10    | Return-Path domain differs from From                            | T1566.001    |
-| +15    | Display name mentions 'paypal.com' but sender domain differs    | T1656        |
-| +25    | Link text differs from real destination                         | T1566.002    |
-| +15    | URL uses a raw IP address                                       | T1566.002    |
-| +10    | URL shortener used: bit.ly                                      | T1566.002    |
-| +30    | Double extension attachment: invoice.pdf.exe                    | T1566.001    |
-| +10    | Urgency/pressure language                                       | T1566        |
-```
-
-The report also lists extracted headers, defanged URLs, attachment hashes and recommended response actions (block sender, purge mailboxes, notify recipients).
-
-## ⚙️ How It Works
-
-```mermaid
-flowchart LR
-    A[".eml file"] --> B["Parser"]
-    B --> C["Headers<br/>SPF / DKIM / DMARC"]
-    B --> D["URLs<br/>text vs href"]
-    B --> E["Attachments<br/>SHA256 + extensions"]
-    C --> F["Threat intel<br/>(optional)"]
-    D --> F
-    E --> F
-    F --> G["Scoring engine<br/>+ MITRE mapping"]
-    G --> H["Report<br/>Markdown / JSON"]
-```
-
-## 🎯 Scoring Engine
-
-Every rule is explicit and lives in [`phishing_analyzer/scoring.py`](phishing_analyzer/scoring.py), so results are explainable and easy to tune.
+Each rule adds points, the total is capped at 100, and the report lists every rule that fired so the result can be explained.
 
 | Signal | Points | ATT&CK |
 |---|:-:|---|
-| SPF fail / softfail | +20 | T1566.001 |
-| DKIM fail | +15 | T1566.001 |
-| DMARC fail | +20 | T1566.001 |
-| No authentication results in headers | +5 | T1566 |
-| Reply-To domain differs from From | +15 | T1566.001 |
-| Return-Path domain differs from From | +10 | T1566.001 |
-| Display-name spoofing | +15 | T1656 |
-| Link text differs from real destination | +25 | T1566.002 |
-| URL points to a raw IP address | +15 | T1566.002 |
+| SPF failed or softfailed | +20 | T1566.001 |
+| DMARC failed | +20 | T1566.001 |
+| DKIM failed | +15 | T1566.001 |
+| No authentication results at all | +5 | T1566 |
+| Replies go to a different domain | +15 | T1566.001 |
+| Bounce address is a different domain | +10 | T1566.001 |
+| Display name borrows another domain | +15 | T1656 |
+| Link text differs from its destination | +25 | T1566.002 |
+| Link points to a raw IP address | +15 | T1566.002 |
+| Lookalike (punycode) domain | +15 | T1566.002 |
 | URL shortener | +10 | T1566.002 |
-| Punycode / homograph domain | +15 | T1566.002 |
 | Double-extension attachment | +30 | T1566.001 |
 | Risky attachment type | +25 | T1566.001 |
-| Urgency / pressure language | +10 | T1566 |
-| Threat-intel hit | +30 | T1566 |
+| Pressure language | +10 | T1566 |
+| Threat-intelligence hit | +30 | T1566 |
 
-| Score | Verdict |
-|:-:|:-:|
-| 0 - 24 | 🟢 LOW |
-| 25 - 49 | 🟡 MEDIUM |
-| 50 - 74 | 🟠 HIGH |
-| 75 - 100 | 🔴 CRITICAL |
+**0 to 24** low, **25 to 49** medium, **50 to 74** high, **75 to 100** critical. The rules live in [`phishlens/scoring.py`](phishlens/scoring.py) and are written to be read and tuned.
 
-## 🗂️ Project Structure
+## Online lookups (optional)
 
-```text
-phishing-analyzer/
-├── phishing_analyzer/
-│   ├── parser.py     # headers, URLs, attachments
-│   ├── scoring.py    # rules + MITRE mapping
-│   ├── intel.py      # VirusTotal / AbuseIPDB
-│   ├── report.py     # Markdown / JSON output
-│   └── cli.py        # command-line interface
-├── samples/          # safe demo emails
-├── tests/            # unit tests
-├── requirements.txt
-└── README.md
-```
+PhishLens can check links, attachment hashes and the sender IP on VirusTotal and AbuseIPDB. Open **Look links and files up online** on the start screen and paste a free key from each. Only those indicators are sent, never the email. VirusTotal's free tier allows four requests a minute, so lookups are capped and paced, which is why this can take a while.
 
-## 🧪 Tests
+For the command line you can set the keys instead:
+
+| Shell | Command |
+|---|---|
+| Windows CMD | `set VT_API_KEY=your_key` and `set ABUSEIPDB_API_KEY=your_key` |
+| PowerShell | `$env:VT_API_KEY="your_key"` and `$env:ABUSEIPDB_API_KEY="your_key"` |
+| Linux / macOS | `export VT_API_KEY=your_key` and `export ABUSEIPDB_API_KEY=your_key` |
+
+## Command line
+
+The same engine works without the window, which suits scripts and bulk work.
 
 ```bash
-pip install pytest
-pytest -q
+phishlens suspicious.eml                  # print a report
+phishlens suspicious.eml -o report.md     # save it
+phishlens suspicious.eml --format json    # machine-readable
+phishlens suspicious.eml --no-intel       # skip online lookups
+phishlens gui --port 9000 --no-browser    # run the window on another port
 ```
 
-<!--
-Uncomment and fill in after testing on real emails:
+On Windows, if `phishlens` is not recognised, use `py -m phishlens` in its place.
 
-## ✅ Tested on Real Samples
+## Built to be safe to run
 
-| Sample | Ground truth | Verdict | Score | Correct |
-|---|---|---|:-:|:-:|
-| sample-1 | Phishing | CRITICAL | 85 | ✔ |
--->
+Phishing emails are hostile input, so PhishLens is careful with them.
 
-## ⚠️ Limitations
+- **Nothing is executed.** Attachments are hashed, never opened.
+- **Defanged output.** Links and link text appear as `hxxp://example[.]com`, and nothing in the window is clickable.
+- **Local only.** The window's server listens on `127.0.0.1` and checks the `Host` and `Origin` headers plus a custom header on every request, so other websites cannot talk to it.
+- **Hostile text stays text.** Anything taken from an email is shown as plain text, never as HTML, and a strict Content-Security-Policy backs that up. The tests feed it emails full of script tags to check.
+- **No dependencies.** Standard library only, so there is nothing to go stale or be compromised.
 
-- Heuristic scoring: a LOW score does not prove an email is safe, and a high score still needs analyst review.
-- Domain comparison is simple (no public-suffix list), so rare false positives are possible.
-- Relies on `Authentication-Results` added by the receiving mail server; forwarded or locally generated emails may lack it.
-- `.eml` only; Outlook `.msg` is planned.
+## How it fits together
 
-## 🛣️ Roadmap
+```mermaid
+flowchart LR
+    A[".eml file"] --> B["parser.py<br/>headers, links, attachments"]
+    B --> C["intel.py<br/>optional lookups"]
+    B --> D["scoring.py<br/>rules and ATT&CK tags"]
+    C --> D
+    D --> E["engine.py"]
+    E --> F["Browser window<br/>server.py + web/"]
+    E --> G["Command line<br/>cli.py"]
+```
+
+```text
+phishlens/
+├── parser.py     reads the email into evidence
+├── scoring.py    turns evidence into a score, each finding pointing at its source
+├── intel.py      VirusTotal and AbuseIPDB
+├── report.py     Markdown, JSON and indicator lists
+├── engine.py     one entry point for both interfaces
+├── server.py     local web server
+├── cli.py        command line
+├── web/          the window (HTML, CSS, JavaScript)
+└── samples/      two safe demo emails
+tests/            unit and security tests
+```
+
+## Development
+
+```bash
+git clone https://github.com/Anas-Abdullah-Sec/phishlens.git
+cd phishlens
+python -m pip install -e .
+python -m unittest discover -s tests -v
+```
+
+The tests cover the parser, the scoring rules, the reports and the server's security checks, and they run on Windows and Linux for every push.
+
+**Publishing a new Windows build:** push a version tag and GitHub Actions builds `PhishLens.exe` and attaches it to a release.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+## Limitations
+
+- A heuristic tool. A low score does not prove an email is safe, and a high score still deserves an analyst's eye.
+- Domain comparison is simple (no public-suffix list), so unusual domains can occasionally be misjudged.
+- SPF, DKIM and DMARC come from the `Authentication-Results` header your mail provider added. Forwarded or locally created messages may not have it.
+- IPv4 only when reading the `Received` chain, and `.eml` only for now.
+
+## Roadmap
 
 - [ ] Outlook `.msg` support
-- [ ] Streamlit web UI (drag-and-drop `.eml`)
-- [ ] Dockerfile for one-command runs
-- [ ] YARA / Sigma rule export for detected indicators
-- [ ] Bulk mode: analyze a folder and produce a summary CSV
+- [ ] Scan a whole folder and export a summary CSV
+- [ ] Publish to PyPI so `pip install phishlens` just works
+- [ ] YARA and Sigma rule export from detected indicators
 
-## 📜 License
+## Disclaimer
 
-Released under the [MIT License](LICENSE). Copyright (c) 2026 Anas Abdullah.
+For education and defensive security. Only analyse emails you are authorised to examine. The bundled samples use reserved example domains and a harmless text file as the "attachment".
 
-## ⚖️ Disclaimer
+## Author
 
-For education and defensive security use only. Analyze only emails you are authorized to examine. Bundled samples use reserved example domains and a harmless text file as the "attachment".
+**Anas Abdullah**, Cybersecurity Analyst
 
-## 👤 Author
+[![GitHub](https://img.shields.io/badge/GitHub-Anas--Abdullah--Sec-181717?logo=github)](https://github.com/Anas-Abdullah-Sec)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-anas2abdullah-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/anas2abdullah)
 
-**Anas Abdullah** · Cybersecurity Analyst
-
-[![GitHub](https://img.shields.io/badge/GitHub-Anas--Abdullah--Sec-181717?style=flat&logo=github)](https://github.com/Anas-Abdullah-Sec)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-anas2abdullah-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/anas2abdullah)
-
-<div align="center">
-
-If you found this useful, consider giving the repo a ⭐
-
-</div>
+Released under the [MIT License](LICENSE).

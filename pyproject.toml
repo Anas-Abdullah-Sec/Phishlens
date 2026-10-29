@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phishlens"
+version = "1.0.0"
+description = "Check a suspicious email (.eml) and see why it looks safe or dangerous. Runs locally, no dependencies."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Anas Abdullah"}]
+keywords = ["phishing", "email-security", "soc", "blue-team", "mitre-attack", "dfir"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Information Technology",
+    "Topic :: Security",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Anas-Abdullah-Sec/phishlens"
+Issues = "https://github.com/Anas-Abdullah-Sec/phishlens/issues"
+
+[project.scripts]
+phishlens = "phishlens.cli:main"
+
+[tool.setuptools]
+packages = ["phishlens"]
+
+[tool.setuptools.package-data]
+phishlens = ["web/*", "samples/*.eml"]

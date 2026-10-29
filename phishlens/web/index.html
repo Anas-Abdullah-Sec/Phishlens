@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>PhishLens</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='14' cy='14' r='9' fill='none' stroke='%230f1419' stroke-width='3'/%3E%3Ccircle cx='14' cy='14' r='3.4' fill='%23d3281c'/%3E%3Cpath d='M21 21l7 7' stroke='%230f1419' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="overlay" id="overlay" hidden><p>Drop the email file to inspect it</p></div>
+
+<header class="bar">
+  <a class="brand" href="/" aria-label="PhishLens">
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="14" cy="14" r="9" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="14" cy="14" r="3.4" class="logo-dot"/><path d="M21 21l7 7" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+    <span>PhishLens</span>
+  </a>
+  <div class="bar-file" id="bar-file" hidden><span id="b-file"></span></div>
+  <div class="bar-actions">
+    <button class="btn quiet" id="again" type="button" hidden>New email</button>
+    <button class="btn quiet" id="quit" type="button">Quit</button>
+  </div>
+</header>
+
+<main id="intake" class="intake">
+  <div class="intake-inner">
+    <h1>Check a suspicious email</h1>
+    <p class="lede">Drop in the message and PhishLens shows who really sent it, where the links lead and what the attachments are, marked up on the email itself.</p>
+
+    <div class="drop" id="drop">
+      <svg class="drop-art" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="6" y="14" width="40" height="30" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        <path d="M8 18l18 13 18-13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="42" cy="40" r="11" class="drop-lens"/>
+        <circle cx="42" cy="40" r="3.2" class="logo-dot"/>
+        <path d="M50 48l8 8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <p class="drop-title">Drop an .eml file anywhere on this page</p>
+      <div class="drop-actions">
+        <button class="btn primary" id="pick" type="button">Choose a file</button>
+        <button class="btn" id="demo" type="button">Open a sample</button>
+      </div>
+      <input id="file" type="file" accept=".eml,message/rfc822" hidden>
+    </div>
+    <p class="status" id="status" role="status" hidden></p>
+    <p class="error" id="error" role="alert" hidden></p>
+
+    <details class="more">
+      <summary>How do I get an .eml file?</summary>
+      <ul class="how">
+        <li><b>Gmail</b> Open the message, press the three dots, choose <em>Download message</em>.</li>
+        <li><b>Outlook</b> Drag the message onto your desktop, or use <em>File, Save As</em>.</li>
+        <li><b>Apple Mail</b> Select it, then <em>File, Save As</em> and pick <em>Raw Message Source</em>.</li>
+        <li><b>Thunderbird</b> Right-click the message and choose <em>Save As</em>.</li>
+      </ul>
+    </details>
+
+    <details class="more">
+      <summary>Look links and files up online <span>(optional)</span></summary>
+      <div class="more-body">
+        <p>Checks links, attachment hashes and the sender IP on VirusTotal and AbuseIPDB. Only those details are sent, never the email. Free keys are rate-limited, so this can take a minute.</p>
+        <label class="check"><input type="checkbox" id="use-intel"> Turn on online lookups</label>
+        <div class="fields">
+          <label>VirusTotal key<input id="vt-key" type="password" autocomplete="off" spellcheck="false"></label>
+          <label>AbuseIPDB key<input id="abuse-key" type="password" autocomplete="off" spellcheck="false"></label>
+        </div>
+      </div>
+    </details>
+  </div>
+</main>
+
+<main id="case" class="workspace" hidden>
+  <aside class="rail rail-left">
+    <section class="card verdict" id="verdict">
+      <div class="ring" id="ring"><div class="ring-inner"><span id="v-num">0</span><small>out of 100</small></div></div>
+      <p class="level"><i></i><span id="v-word"></span></p>
+      <p class="vnote" id="v-note"></p>
+    </section>
+
+    <section class="card" data-ref="auth">
+      <h3>Sender authentication <span class="pin-slot"></span></h3>
+      <ul class="auth" id="auth"></ul>
+      <p class="origin" id="origin"></p>
+    </section>
+
+    <section class="card actions">
+      <button class="btn primary" id="copy-iocs" type="button">Copy indicators</button>
+      <div class="split">
+        <button class="btn" id="dl-md" type="button">Report</button>
+        <button class="btn" id="dl-json" type="button">JSON</button>
+      </div>
+      <p class="hint">Copied indicators are defanged, so they are safe to paste into a ticket.</p>
+    </section>
+  </aside>
+
+  <article class="mail-col">
+    <div class="paper">
+      <header class="mail-head">
+        <h2 id="m-subject"></h2>
+        <div class="sender" data-ref="from">
+          <span class="avatar" id="m-avatar" aria-hidden="true"></span>
+          <div class="sender-text">
+            <div class="sender-name"><span id="m-from"></span><span class="pin-slot"></span></div>
+            <div class="sender-addr" id="m-addr"></div>
+          </div>
+        </div>
+        <dl class="hdrs" id="m-hdrs"></dl>
+      </header>
+      <div class="mail-body" id="m-body"></div>
+      <footer class="mail-atts" id="m-atts" hidden></footer>
+    </div>
+    <p class="paper-note">Numbered markers show where each finding comes from. Select one, or a finding on the right, to jump between them.</p>
+  </article>
+
+  <aside class="rail rail-right">
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" aria-selected="true" data-tab="findings" type="button">Findings <b id="n-find"></b></button>
+      <button role="tab" aria-selected="false" data-tab="links" type="button">Links <b id="n-links"></b></button>
+      <button role="tab" aria-selected="false" data-tab="iocs" type="button">Indicators</button>
+      <button role="tab" aria-selected="false" data-tab="lookups" type="button" id="tab-lookups" hidden>Lookups</button>
+    </div>
+    <div class="panel-body" id="panel-findings" role="tabpanel">
+      <ol class="findings" id="findings"></ol>
+      <p class="total" id="total"></p>
+    </div>
+    <div class="panel-body" id="panel-links" role="tabpanel" hidden></div>
+    <div class="panel-body" id="panel-iocs" role="tabpanel" hidden></div>
+    <div class="panel-body" id="panel-lookups" role="tabpanel" hidden></div>
+  </aside>
+</main>
+
+<footer class="foot">
+  <span>PhishLens</span>
+  <span>MIT licensed</span>
+  <a href="https://github.com/Anas-Abdullah-Sec/phishlens" target="_blank" rel="noopener noreferrer">Source</a>
+  <span>Made by <a href="https://www.linkedin.com/in/anas2abdullah" target="_blank" rel="noopener noreferrer">Anas Abdullah</a></span>
+</footer>
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
