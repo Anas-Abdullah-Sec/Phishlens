@@ -1,0 +1,26 @@
+PhishLens - portable Windows bundle
+====================================
+
+1. Right-click the zip and choose "Extract All". Do not run it from inside the zip.
+2. Open the extracted folder and double-click PhishLens.bat.
+3. A black window opens (leave it open) and PhishLens appears in your browser.
+4. When you are done, press Quit in the browser, or close the black window.
+
+Nothing is installed on your computer. To remove PhishLens, delete the folder.
+
+What is inside
+--------------
+python\            The official Python from python.org (signed by the Python Software Foundation).
+python\phishlens\  PhishLens itself. It is plain source code, so you can read every line.
+
+If Windows shows "Windows protected your PC"
+--------------------------------------------
+Choose "More info", then "Run anyway". PhishLens is not code-signed.
+
+If Windows 11 says "Smart App Control blocked an app"
+-----------------------------------------------------
+Please do NOT turn Smart App Control off (it cannot be turned back on without reinstalling
+Windows). Install Python from https://www.python.org/downloads/ instead, then use
+Start-PhishLens.bat from the source download on the PhishLens GitHub page.
+
+Source and help: https://github.com/Anas-Abdullah-Sec/phishlens

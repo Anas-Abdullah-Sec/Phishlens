@@ -25,16 +25,18 @@ Everything runs on your own computer. No account, no upload, no dependencies.
 
 ## Get it
 
-### Windows, no Python needed
+PhishLens is plain Python, so it needs no installer and nothing is compiled. Pick whichever suits you.
 
-1. Download **`PhishLens.exe`** from the [latest release](https://github.com/Anas-Abdullah-Sec/phishlens/releases/latest).
-2. Double-click it. A small console window opens (leave it open) and PhishLens appears in your browser.
+### Windows, nothing to install
 
-Windows may say it "protected your PC" because the file is not code-signed. Choose **More info**, then **Run anyway**. The executable is built from this repository by GitHub Actions, and you can read the workflow in [`.github/workflows/release.yml`](.github/workflows/release.yml).
+1. Download **`PhishLens-windows.zip`** from the [latest release](https://github.com/Anas-Abdullah-Sec/phishlens/releases/latest).
+2. Right-click it, choose **Extract All**, open the new folder and double-click **`PhishLens.bat`**.
+
+A black window opens (leave it open) and PhishLens appears in your browser. The zip carries the official Python from python.org, so you do not need to install Python yourself. To remove PhishLens, delete the folder.
 
 ### Windows, if you already have Python
 
-Press **Code, Download ZIP** on this page, extract it, and double-click **`Start-PhishLens.bat`**.
+Press **Code, Download ZIP** on this page, extract it, and double-click **`Start-PhishLens.bat`**. If Python is missing, the file opens the download page for you.
 
 ### Any system, with pip
 
@@ -46,6 +48,13 @@ python -m phishlens gui
 ```
 
 No Git required. If you prefer pipx: `pipx install git+https://github.com/Anas-Abdullah-Sec/phishlens.git`, then run `phishlens gui`.
+
+### About Windows warnings
+
+PhishLens is not code-signed. Individual developers in many countries cannot get a free signing certificate, and an unsigned program is exactly what Windows warns about.
+
+- **"Windows protected your PC"** (SmartScreen): choose **More info**, then **Run anyway**.
+- **"Smart App Control blocked an app"** (strict mode on some Windows 11 PCs): this has no "run anyway", and turning it off cannot be undone without reinstalling Windows, so please do not. Install Python from python.org (its `python.exe` is signed) and use **`Start-PhishLens.bat`** or the pip route above. PhishLens itself is just readable source code, so there is no unsigned program for Windows to block.
 
 ## Using it
 
@@ -176,11 +185,11 @@ python -m unittest discover -s tests -v
 
 The tests cover the parser, the scoring rules, the reports and the server's security checks, and they run on Windows and Linux for every push.
 
-**Publishing a new Windows build:** push a version tag and GitHub Actions builds `PhishLens.exe` and attaches it to a release.
+**Publishing a new Windows bundle:** push a version tag and GitHub Actions builds `PhishLens-windows.zip` and attaches it to a release.
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.0.1
+git push origin v1.0.1
 ```
 
 ## Limitations

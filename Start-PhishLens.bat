@@ -13,8 +13,9 @@ if %errorlevel%==0 (
 )
 echo.
 echo PhishLens needs Python 3.9 or newer.
-echo Install it from https://www.python.org/downloads/
-echo and tick "Add Python to PATH" on the first screen. Then run this file again.
+echo Opening the download page. Tick "Add Python to PATH" on the first screen,
+echo install it, then run this file again.
+start "" https://www.python.org/downloads/
 :done
 echo.
 pause
