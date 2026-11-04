@@ -7,9 +7,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+           
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python: ["3.9", "3.12"]
+        include:
+          - os: windows-latest
+            python: "3.9"
+          - os: windows-latest
+            python: "3.12"
+          - os: ubuntu-latest
+            python: "3.12"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
